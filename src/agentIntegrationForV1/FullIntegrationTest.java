@@ -133,10 +133,9 @@ public class FullIntegrationTest {
 						inspectionStand);
 				gKitRobot = new GKitRobot();
 				kitRobot.setGui(gKitRobot);
-				kitRobotController = new KitRobotController(kitRobot, gKitRobot);
-				kitRobot.setController(kitRobotController);
+				
 				conveyorSystem.setKitRobot(kitRobot);
-				kitRobotController.setServer(server);
+//				kitRobotController.setServer(server);
 
 				// setting up partRobot
 				//nests = new ArrayList<Nest>();
@@ -205,7 +204,10 @@ public class FullIntegrationTest {
 					((FeederAgent) feeder).startThread();
 				}
 				
+
+				kitRobot.setController(kitRobotController);
 				server = new GUIServer(kitRobotController, conveyorController, gantryController, laneSysController, partRobotController, visionController);
+				kitRobotController = new KitRobotController(kitRobot, gKitRobot);
 //				server = new GUIServer();
 				server.setKitRobotController(kitRobotController);
 				server.setConveyorSystemController(conveyorController);

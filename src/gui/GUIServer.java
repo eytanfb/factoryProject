@@ -173,7 +173,7 @@ public class GUIServer implements Server
 		this.lanesysController = laneSysController;
 		this.partRobotController = partRobotController;
 
-		this.kitRobotController.setServer(this);
+//		this.kitRobotController.setServer(this);
 		this.conveyorSystemController.setServer(this);
 		this.gantryController.setServer(this);
 		this.visionController.setServer(this);
@@ -479,263 +479,6 @@ public class GUIServer implements Server
 	}
 
 	// //////// CLASSES //////////
-//	public class ServerReceiveThread implements Runnable
-//	{
-//		private Socket mySocket;
-//
-//		public ServerReceiveThread(Socket s)
-//		{
-//			mySocket = s;
-//		}
-//
-//		public void run()
-//		{
-//			try
-//			{
-//				ObjectInputStream ois = new ObjectInputStream(mySocket.getInputStream());
-//
-//				while (true)
-//				{
-//					command = ois.readObject().toString();
-//					the_shit.add(command);
-//					if (the_shit.size() != 0)
-//					{
-//						System.out.println("GUIServer: " + command);
-//						/*
-//						 * TODO: MAKE THESE ENUMS
-//						 */
-//						// FACTORY COMMANDS //
-//						if (command.equals("UpdatePartsList"))
-//						{
-//							partList = (ArrayList<GPart>) ois.readObject();
-//							for (Handler sst : Handlers)
-//								sst.update(command);
-//						}
-//						else if (command.equals("Kits"))
-//						{
-//							for (Handler sst : Handlers)
-//								sst.update(command);
-//						}
-//						else if (command.equals("Kit_Chosen"))
-//						{
-//							System.out.println("GUIServer: THis should be the kit name.");
-//							chosenKit = (GKit) ois.readObject();
-//							chosenKit.setPartsList();
-//							partRobotController.msgGiveConfig(chosenKit.partsKit,
-//									chosenKit.kitName, chosenKit.kitNumber);
-//							for (Handler sst : Handlers)
-//								sst.update(command);
-//						}
-//						else if (command.equals("FPM_Kits"))
-//						{
-//							for (Handler sst : Handlers)
-//								sst.update(command);
-//						}
-//						else if (command.equals("RequestPartsList"))
-//						{
-//							for (Handler sst : Handlers)
-//								sst.update(command);
-//						}
-//						// KIT MANAGER COMMANDS //
-//						else if (command.equals("UpdateKitList"))
-//						{
-//							kitTypeList = (ArrayList<GKit>) ois.readObject();
-//							for (Handler sst : Handlers)
-//								sst.update(command);
-//						}
-//						// KIT ROBOT COMMANDS //
-//
-//						else if (command.equals("KitRobot_AnimationDone"))
-//						{
-//							kitRobotController.animDone();
-//						}
-//
-//						// CONVEYOR COMMANDS //
-//						else if (command.equals("ConveyorIn_AnimationDone"))
-//						{
-//							System.out
-//									.println("GUIServer: Before Calling conveyorin animation done");
-//							// chosenKit = (GKit) ois.readObject();
-//							conveyorSystemController.animDone();
-//							// activeKitList = (ArrayList<GKit>)
-//							// ois.readObject();
-//							// for(ServerSendThread sst :
-//							// serverToClientThreads)
-//							// sst.update(command);
-//						}
-//
-//						// PART ROBOT COMMANDS //
-//						else if (command.equals("PartRobot_PickUpParts"))
-//						{
-//							for (Handler sst : Handlers)
-//								sst.update(command);
-//						}
-//						else if (command.equals("PartRobot_PutDownToKit"))
-//						{
-//							for (Handler sst : Handlers)
-//								sst.update(command);
-//						}
-//						else if (command.equals("PartRobot_PickedUp"))
-//						{
-//							for (Handler sst : Handlers)
-//								sst.update(command);
-//						}
-//						else if (command.equals("PartRobot_AnimationDone"))
-//						{
-//							partRobotController.animDone();
-//						}
-//
-//						// FEEDER COMMANDS //
-//						else if (command.equals("Feeder_ReleaseBinToGantry_Done"))
-//						{
-//							// partRobotController.animDone();
-//						}
-//						else if (command.equals("Feeder_PlaceBin_Done"))
-//						{
-//							// partRobotController.animDone();
-//						}
-//						else if (command.equals("Feeder_ChangeDiverter_Done"))
-//						{
-//							// partRobotController.animDone();
-//						}
-//
-//						// LANE COMMANDS //
-//						else if (command.equals("Lane_RunLane_Done"))
-//						{
-//							// lanesysController.MessageLane((Integer)
-//							// ois.readObject());
-//						}
-//
-//						// NEST COMMANDS //
-//						else if (command.equals("Nest_PurgeNest_Done"))
-//						{
-//							// NestController.msgPartPutInNest()
-//						}
-//						else if (command.equals("Nest_TakePicture_Done"))
-//						{
-//							System.out.println("GUIServer: AnimDoneVision");
-//							visionController.animDone();
-//						}
-//						else if (command.equals("Nest_GivePart_Done"))
-//						{
-//							// NestController.msgDidFeedPart()
-//						}
-//						else if (command.equals("Nest_PartFed"))
-//						{
-//							targetNestNumber = (Integer) ois.readObject();
-//							nestPartType = (String) ois.readObject();
-//
-//							lanesysController.MessageLane(targetNestNumber);
-//							for (Handler sst : Handlers)
-//								sst.update(command);
-//							// laneAgent.msgPartPutInNest((Integer)
-//							// ois.readObject());
-//						}
-//						// GANTRY COMMANDS //
-//						else if (command.equals("GantryRobot_DoPickUpNewBin"))
-//						{
-//							newPartType = (String) ois.readObject();
-//							for (Handler sst : Handlers)
-//								sst.update(command);
-//						}
-//						else if (command.equals("GantryRobot_DoPickUpNewBin_Done"))
-//						{
-//							gantryController.animDone();
-//						}
-//						else if (command.equals("GantryRobot_DoDeliverBinToFeeder"))
-//						{
-//							lastFeederAt = (Integer) ois.readObject();
-//							for (Handler sst : Handlers)
-//								sst.update(command);
-//						}
-//						else if (command.equals("GantryRobot_DoDeliverBinToFeeder_Done"))
-//						{
-//							System.out.println("command DoDeliverBinToFeeder_Done");
-//							gantryController.animDone();
-//						}
-//						else if (command.equals("GantryRobot_DoDropBin"))
-//						{
-//							System.out.println("GUIServer: DoDropBin Server received");
-//
-//							dropBinType = (String) ois.readObject();
-//							for (Handler sst : Handlers)
-//								sst.update(command);
-//						}
-//						else if (command.equals("GantryRobot_DoDropBin_Done"))
-//						{
-//							gantryController.animDone();
-//						}
-//						else if (command.equals("GantryRobot_DoPickUpPurgedBin"))
-//						{
-//							lastFeederAt = (Integer) ois.readObject();
-//							for (Handler sst : Handlers)
-//								sst.update(command);
-//						}
-//						else if (command.equals("GantryRobot_DoPickUpPurgedBin_Done"))
-//						{
-//							gantryController.animDone();
-//						}
-//						else if (command.equals("GantryRobot_DoDeliverBinToRefill"))
-//						{
-//							for (Handler sst : Handlers)
-//								sst.update(command);
-//						}
-//						else if (command.equals("GantryRobot_DoDeliverBinToRefill_Done"))
-//						{
-//							gantryController.animDone();
-//						}
-//
-//						// CLOSE COMMAND //
-//						else if (command.equals("close"))
-//						{
-//							try
-//							{
-//								fOut = new FileOutputStream("FACTORY_SAVE_FILE.sav");
-//								obOut = new ObjectOutputStream(fOut);
-//								obOut.writeObject(kitTypeList);
-//								obOut.reset();
-//								obOut.writeObject(partList);
-//								obOut.reset();
-//								obOut.close();
-//								System.out.println("Factory saved");
-//							} catch (FileNotFoundException e)
-//							{
-//								e.printStackTrace();
-//							} catch (IOException e)
-//							{
-//								e.printStackTrace();
-//							}
-//							break;
-//
-//						}
-//						the_shit.remove(0);
-//						for (int i = 0; i < the_shit.size(); i++)
-//						{
-//							System.out.println(the_shit.get(i));
-//						}
-//					}
-//				}
-//				ois.close();
-//			} catch (Exception e)
-//			{
-//				e.printStackTrace();
-//
-//			} finally
-//			{
-//				try
-//				{
-//					mySocket.close();
-//					ss.close();
-//				} catch (IOException e)
-//				{
-//					e.printStackTrace();
-//				}
-//			}
-//
-//		}
-//
-//	}
-
 	public class Handler implements Runnable
 	{
 		private Socket mySocket;
@@ -858,84 +601,6 @@ public class GUIServer implements Server
 								h.oos.reset();
 							}
 							
-						}
-						// KIT ROBOT currentMessageS //
-						else if (currentMessage.equals("KitRobot_PutKit"))
-						{
-							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
-							for(Handler h:Handlers)
-							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
-								
-								
-								// Determine the origin type
-								if (activeKitOrigin.getGui() instanceof GConveyorIn) {
-									h.oos.writeObject("ConveyorIn");
-									h.oos.reset();
-								}
-								else if (activeKitOrigin.getGui() instanceof GKittingStand) {
-									if (activeKitOrigin.getGui().getY() == 550)
-									{
-										h.oos.writeObject("rightWorkingStand");
-										h.oos.reset();
-									}
-									else if (activeKitOrigin.getGui().getY() == 350)
-									{
-										h.oos.writeObject("leftWorkingStand");
-										h.oos.reset();
-									}
-									else if (activeKitOrigin.getGui().getY() == 100)
-									{
-										h.oos.writeObject("inspectionStand");
-										h.oos.reset();
-									}
-								}
-								
-								// Determine the destination type
-								if (activeKitDestination.getGui() instanceof GConveyorOut) {
-									h.oos.writeObject("ConveyorOut");
-									h.oos.reset();
-								}
-								else if (activeKitDestination.getGui() instanceof GKittingStand) {
-									if (activeKitDestination.getGui().getY() == 550)
-									{
-										h.oos.writeObject("rightWorkingStand");
-										h.oos.reset();
-									}
-									else if (activeKitDestination.getGui().getY() == 350)
-									{
-										h.oos.writeObject("leftWorkingStand");
-										h.oos.reset();
-									}
-									else if (activeKitDestination.getGui().getY() == 100)
-									{
-										h.oos.writeObject("inspectionStand");
-										h.oos.reset();
-									}
-								}
-								
-								
-								// Determine the parts in kit
-								h.oos.writeObject(new Integer(activeKit.parts.size()));
-								h.oos.reset();
-								for(int i=0;i<activeKit.parts.size();i++)
-								{
-									h.oos.writeObject(activeKit.parts.get(i).partType);
-									h.oos.reset();
-								}
-							}
-							
-							
-							
-							
-							
-//							h.oos.writeObject(activeKitOrigin);
-//							oos.reset();
-//							oos.writeObject(activeKitDestination);
-//							oos.reset();
-//							oos.writeObject(activeKit);
-//							oos.reset();
 						}
 						// PART ROBOT currentMessageS //
 						else if (currentMessage.equals("PartRobot_MoveToNest"))
@@ -1423,7 +1088,76 @@ public class GUIServer implements Server
 						}
 					}
 					// KIT ROBOT COMMANDS //
-
+					
+					// KIT ROBOT currentMessageS //
+					else if (command.equals("KitRobot_PutKit"))
+					{
+						Kittable activeKitOrigin_temp=(Kittable) ois.readObject();
+						Kittable activeKitDestination_temp=(Kittable) ois.readObject();
+						Kit activeKit_temp=(Kit) ois.readObject();
+						
+						//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
+						for(Handler h:Handlers)
+						{
+							h.oos.writeObject(command);
+							h.oos.reset();
+							
+							
+							// Determine the origin type
+							if (activeKitOrigin_temp.getGui() instanceof GConveyorIn) {
+								h.oos.writeObject("ConveyorIn");
+								h.oos.reset();
+							}
+							else if (activeKitOrigin_temp.getGui() instanceof GKittingStand) {
+								if (activeKitOrigin_temp.getGui().getY() == 550)
+								{
+									h.oos.writeObject("rightWorkingStand");
+									h.oos.reset();
+								}
+								else if (activeKitOrigin_temp.getGui().getY() == 350)
+								{
+									h.oos.writeObject("leftWorkingStand");
+									h.oos.reset();
+								}
+								else if (activeKitOrigin_temp.getGui().getY() == 100)
+								{
+									h.oos.writeObject("inspectionStand");
+									h.oos.reset();
+								}
+							}
+							
+							// Determine the destination type
+							if (activeKitDestination_temp.getGui() instanceof GConveyorOut) {
+								h.oos.writeObject("ConveyorOut");
+								h.oos.reset();
+							}
+							else if (activeKitDestination_temp.getGui() instanceof GKittingStand) {
+								if (activeKitDestination_temp.getGui().getY() == 550)
+								{
+									h.oos.writeObject("rightWorkingStand");
+									h.oos.reset();
+								}
+								else if (activeKitDestination_temp.getGui().getY() == 350)
+								{
+									h.oos.writeObject("leftWorkingStand");
+									h.oos.reset();
+								}
+								else if (activeKitDestination_temp.getGui().getY() == 100)
+								{
+									h.oos.writeObject("inspectionStand");
+									h.oos.reset();
+								}
+							}
+							// Determine the parts in kit
+							h.oos.writeObject(new Integer(activeKit_temp.parts.size()));
+							h.oos.reset();
+							for(int i=0;i<activeKit_temp.parts.size();i++)
+							{
+								h.oos.writeObject(activeKit_temp.parts.get(i).partType);
+								h.oos.reset();
+							}
+						}
+					}
 					else if (command.equals("KitRobot_AnimationDone"))
 					{
 						kitRobotController.animDone();
