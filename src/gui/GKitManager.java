@@ -54,7 +54,7 @@ public class GKitManager extends JFrame implements ActionListener
 		connectToServer(); // sets up sending and receiving sockets
 		requestGPartsList(); // requests for the GParts list to build kit
 	}
-
+	//trying out git
 	// //////// MAIN //////////
 	public static void main(String[] args)
 	{
