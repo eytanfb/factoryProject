@@ -11,6 +11,8 @@ import interfaces.Nest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import controllers.ConveyorSystemController;
 import controllers.GantryController;
@@ -133,6 +135,8 @@ public class FullIntegrationTest {
 						inspectionStand);
 				gKitRobot = new GKitRobot();
 				kitRobot.setGui(gKitRobot);
+				kitRobotController = new KitRobotController(kitRobot, gKitRobot);
+				kitRobot.setController(kitRobotController);
 				
 				conveyorSystem.setKitRobot(kitRobot);
 //				kitRobotController.setServer(server);
@@ -204,10 +208,26 @@ public class FullIntegrationTest {
 					((FeederAgent) feeder).startThread();
 				}
 				
-
-				kitRobot.setController(kitRobotController);
+//				new Timer().schedule(new TimerTask(){
+//					public void run()
+//					{
+//						System.out.println("FullIntegration: Connecting controller");
+//						kitRobotController.connect();
+//					}
+//				}, 10000);
+//				new Thread(){
+//					public void run()
+//					{
+//						new Timer().schedule(new TimerTask(){
+//							public void run()
+//							{
+//								System.out.println("FullIntegration: Connecting controller");
+//								kitRobotController.connect();
+//							}
+//						}, 10000);
+//					}
+//				}.start();
 				server = new GUIServer(kitRobotController, conveyorController, gantryController, laneSysController, partRobotController, visionController);
-				kitRobotController = new KitRobotController(kitRobot, gKitRobot);
 //				server = new GUIServer();
 				server.setKitRobotController(kitRobotController);
 				server.setConveyorSystemController(conveyorController);

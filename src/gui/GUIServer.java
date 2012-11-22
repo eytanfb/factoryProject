@@ -8,7 +8,9 @@ import interfaces.Server;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.List;
 
 import javax.swing.*;
 
@@ -32,6 +34,7 @@ import java.net.*;
 
 public class GUIServer implements Server
 {
+	boolean flag = false; // TODO this is a fucking hack
 	// //////// SAVE FILE VARIABLES //////////
 	FileOutputStream fOut;
 	FileInputStream fIn;
@@ -41,7 +44,7 @@ public class GUIServer implements Server
 	// //////// NETWORKING VARIABLES //////////
 	ServerSocket ss;
 	//ArrayList<ServerReceiveThread> clientToServerThreads = new ArrayList<ServerReceiveThread>();
-	ArrayList<Handler> Handlers = new ArrayList<Handler>();
+	List<Handler> Handlers = Collections.synchronizedList(new ArrayList<Handler>());
 	volatile String command = new String();
 	volatile ArrayList<String> agentMessages=new ArrayList<String>();
 
@@ -506,6 +509,11 @@ public class GUIServer implements Server
 				{
 					if(agentMessages.size()!=0)
 					{
+						if(!flag)
+						{
+							kitRobotController.connect();
+							flag = true;
+						}
 						String currentMessage=agentMessages.remove(0);
 						
 						if (currentMessage.equals("Kits"))
@@ -621,18 +629,22 @@ public class GUIServer implements Server
 						{
 							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
 							
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
-								
-								if (activeKit.getStand() == 1) {
-									h.oos.writeObject(new Integer(1));
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
 									h.oos.reset();
-								}
-								else if (activeKit.getStand() == 2) {
-									h.oos.writeObject(new Integer(2));
-									h.oos.reset();
+
+									if (activeKit.getStand() == 1)
+									{
+										h.oos.writeObject(new Integer(1));
+										h.oos.reset();
+									} else if (activeKit.getStand() == 2)
+									{
+										h.oos.writeObject(new Integer(2));
+										h.oos.reset();
+									}
 								}
 							}
 							
@@ -643,45 +655,57 @@ public class GUIServer implements Server
 						{
 							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
 							Integer temp=partRobot_targetNests.remove(0);
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
-								h.oos.writeObject(temp);
-								h.oos.reset();
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+									h.oos.writeObject(temp);
+									h.oos.reset();
+								}
 							}
 							
 						}
 						else if (currentMessage.equals("PartRobot_PickedUp"))
 						{
-							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
+								//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+								}
 							}
 							
 						}
 						else if (currentMessage.equals("PartRobot_DropPartsInKit"))
 						{
-							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
+								//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+								}
 							}
 							
 						}
 						// NEST currentMessageS //
 						else if (currentMessage.equals("Nest_TakePicture"))
 						{
-							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
-								h.oos.writeObject(nestNumberToTakePicture);
-								h.oos.reset();
+								//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+									h.oos.writeObject(nestNumberToTakePicture);
+									h.oos.reset();
+								}
 							}
 							
 						}
@@ -690,28 +714,32 @@ public class GUIServer implements Server
 						{
 							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
 							
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
-								
-								if(currentConveyor instanceof EnteringConveyor)
+								for (Handler h : Handlers)
 								{
-									h.oos.writeObject("Entering");
+									h.oos.writeObject(currentMessage);
 									h.oos.reset();
-								}
-								else if(currentConveyor instanceof ExitingConveyor)
-								{
-									h.oos.writeObject("Exiting");
+
+									if (currentConveyor instanceof EnteringConveyor)
+									{
+										h.oos.writeObject("Entering");
+										h.oos.reset();
+									} else if (currentConveyor instanceof ExitingConveyor)
+									{
+										h.oos.writeObject("Exiting");
+										h.oos.reset();
+									}
+
+									h.oos.writeObject(new Integer(
+											activeKit.parts.size()));
 									h.oos.reset();
-								}
-	
-								h.oos.writeObject(new Integer(activeKit.parts.size()));
-								h.oos.reset();
-								for(int i=0;i<activeKit.parts.size();i++)
-								{
-									h.oos.writeObject(activeKit.parts.get(i).partType);
-									h.oos.reset();
+									for (int i = 0; i < activeKit.parts.size(); i++)
+									{
+										h.oos.writeObject(activeKit.parts
+												.get(i).partType);
+										h.oos.reset();
+									}
 								}
 							}
 							
@@ -732,11 +760,14 @@ public class GUIServer implements Server
 						// }
 						else if (currentMessage.equals("KitRobot_MoveKitToLeftWorkingStand"))
 						{
-							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
+								//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+								}
 							}
 							
 							// h.oos.writeObject(activeKitList);
@@ -744,11 +775,14 @@ public class GUIServer implements Server
 						}
 						else if (currentMessage.equals("ConveyorOut_KitOutFinished"))
 						{
-							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
+								//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+								}
 							}
 							
 							// h.oos.writeObject(activeKitList);
@@ -758,13 +792,16 @@ public class GUIServer implements Server
 						// FEEDER currentMessageS //
 						else if (currentMessage.equals("Feeder_ReleaseBinToGantry"))
 						{
-							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
-								h.oos.writeObject(targetFeederNumber);
-								h.oos.reset();
+								//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+									h.oos.writeObject(targetFeederNumber);
+									h.oos.reset();
+								}
 							}
 							
 						}
@@ -772,26 +809,32 @@ public class GUIServer implements Server
 						{
 							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
 							
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
-								h.oos.writeObject(targetFeederNumber);
-								h.oos.reset();
-								h.oos.writeObject(diverterDirection);
-								h.oos.reset();
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+									h.oos.writeObject(targetFeederNumber);
+									h.oos.reset();
+									h.oos.writeObject(diverterDirection);
+									h.oos.reset();
+								}
 							}
 							
 						}
 						else if (currentMessage.equals("Feeder_PlaceBin"))
 						{
-							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
-								h.oos.writeObject(targetFeederNumber);
-								h.oos.reset();
+								//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+									h.oos.writeObject(targetFeederNumber);
+									h.oos.reset();
+								}
 							}
 							
 						}
@@ -799,18 +842,21 @@ public class GUIServer implements Server
 						// LANE currentMessageS //
 						else if (currentMessage.equals("Lane_RunLane"))
 						{
-							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
-								h.oos.writeObject(targetLaneNumber);
-								h.oos.reset();
-								String typeAddress = convertToAddress(partToUse.partType);
-								h.oos.writeObject(typeAddress);
-								h.oos.reset();
-								h.oos.writeObject(numberOfParts);
-								h.oos.reset();
+								//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+									h.oos.writeObject(targetLaneNumber);
+									h.oos.reset();
+									String typeAddress = convertToAddress(partToUse.partType);
+									h.oos.writeObject(typeAddress);
+									h.oos.reset();
+									h.oos.writeObject(numberOfParts);
+									h.oos.reset();
+								}
 							}
 							
 						}
@@ -818,13 +864,16 @@ public class GUIServer implements Server
 						// NEST currentMessageS //
 						else if (currentMessage.equals("Nest_PurgeNest"))
 						{
-							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
-								h.oos.writeObject(targetNestNumber);
-								h.oos.reset();
+								//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+									h.oos.writeObject(targetNestNumber);
+									h.oos.reset();
+								}
 							}
 							
 						}
@@ -832,12 +881,15 @@ public class GUIServer implements Server
 						{
 							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
 							
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
-								h.oos.writeObject(targetNestNumber);
-								h.oos.reset();
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+									h.oos.writeObject(targetNestNumber);
+									h.oos.reset();
+								}
 							}
 							
 						}
@@ -847,14 +899,17 @@ public class GUIServer implements Server
 							//System.out.println("GUIServer: TargetNestNuber: " + targetNestNumber);
 							//System.out.println("GUIServer: nestPartType: " + nestPartType);
 							
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
-								h.oos.writeObject(targetNestNumber);
-								h.oos.reset();
-								h.oos.writeObject(nestPartType);
-								h.oos.reset();
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+									h.oos.writeObject(targetNestNumber);
+									h.oos.reset();
+									h.oos.writeObject(nestPartType);
+									h.oos.reset();
+								}
 							}
 							
 						}
@@ -874,25 +929,31 @@ public class GUIServer implements Server
 						// GANTRY currentMessageS //
 						else if (currentMessage.equals("GantryRobot_ReleaseBinToGantry"))
 						{
-							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
-								h.oos.writeObject(targetFeederNumber);
-								h.oos.reset();
+								//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+									h.oos.writeObject(targetFeederNumber);
+									h.oos.reset();
+								}
 							}
 						
 						}
 						else if (currentMessage.equals("GantryRobot_DoPickUpNewBin"))
 						{
-							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
-								h.oos.writeObject(newPartType);
-								h.oos.reset();
+								//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+									h.oos.writeObject(newPartType);
+									h.oos.reset();
+								}
 							}
 							
 						}
@@ -901,12 +962,15 @@ public class GUIServer implements Server
 
 							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
 							
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
-								h.oos.writeObject(targetFeederNumber);
-								h.oos.reset();
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+									h.oos.writeObject(targetFeederNumber);
+									h.oos.reset();
+								}
 							}
 							
 						}
@@ -915,10 +979,13 @@ public class GUIServer implements Server
 							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
 							//System.out.println("GUIServer: DoDropBin Server sent");
 							
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+								}
 							}
 							
 						}
@@ -926,12 +993,15 @@ public class GUIServer implements Server
 						{
 							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
 							
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
-								h.oos.writeObject(targetFeederNumber);
-								h.oos.reset();
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+									h.oos.writeObject(targetFeederNumber);
+									h.oos.reset();
+								}
 							}
 							
 						}
@@ -939,10 +1009,13 @@ public class GUIServer implements Server
 						{
 							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
 							
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+								}
 							}
 							
 						}
@@ -950,12 +1023,15 @@ public class GUIServer implements Server
 						{
 							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
 							
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
-								h.oos.writeObject(targetFeederNumber);
-								h.oos.reset();
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+									h.oos.writeObject(targetFeederNumber);
+									h.oos.reset();
+								}
 							}
 							
 						}
@@ -965,13 +1041,16 @@ public class GUIServer implements Server
 						{
 							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
 							
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
-								//System.out.println("GUIServer: targetNestNumber = " + targetNestNumber);
-								h.oos.writeObject(targetNestNumber);
-								h.oos.reset();
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+									//System.out.println("GUIServer: targetNestNumber = " + targetNestNumber);
+									h.oos.writeObject(targetNestNumber);
+									h.oos.reset();
+								}
 							}
 							
 						}
@@ -979,10 +1058,13 @@ public class GUIServer implements Server
 						{
 							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
 							
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+								}
 							}
 							
 						}
@@ -991,10 +1073,13 @@ public class GUIServer implements Server
 						{
 							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
 							
-							for (Handler h : Handlers)
+							synchronized (Handlers)
 							{
-								h.oos.writeObject(currentMessage);
-								h.oos.reset();
+								for (Handler h : Handlers)
+								{
+									h.oos.writeObject(currentMessage);
+									h.oos.reset();
+								}
 							}
 							
 						}
@@ -1054,6 +1139,11 @@ public class GUIServer implements Server
 							sst.oos.reset();
 						}
 					}
+					
+					else if (command.equals("Kit_TakePicture_Done")) {
+						visionController.animDone();
+					}
+					
 					else if (command.equals("FPM_Kits"))
 					{
 						for (Handler sst : Handlers)

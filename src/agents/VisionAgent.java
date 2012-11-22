@@ -62,7 +62,7 @@ public class VisionAgent extends Agent implements Vision {
 	GPartRobotGraphicsPanel gui;
 	int[] nestCount = new int[8];
 
-	Semaphore animation = new Semaphore(1);
+	Semaphore animation = new Semaphore(0);
 
 	public VisionAgent(String name, IVisionController gui) {
 		this.name = name;
@@ -184,6 +184,14 @@ public class VisionAgent extends Agent implements Vision {
 		// normative
 		// kitRobot.msgKitIsGood(new Kit(kit));
 		controller.doShootKit();
+		try
+		{
+			animation.acquire();
+		} catch (InterruptedException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		kitRobot.msgKitIsGood(kit);
 		System.out.println("Telling kit robot kit is good");
 		stateChanged();

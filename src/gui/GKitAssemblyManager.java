@@ -257,6 +257,7 @@ public class GKitAssemblyManager extends JFrame implements ActionListener
 					else if (command.equals("Camera_ShootKit"))
 					{
 						KAMPanel.shootKit();
+						sendUpdate("Kit_TakePicture_Done");
 					}
 					else
 					{
@@ -321,7 +322,7 @@ public class GKitAssemblyManager extends JFrame implements ActionListener
 		add(KAMPanel);
 		validate();
 
-		timer = new Timer(500, this);
+		timer = new Timer(1000, this);
 		timer.start();
 
 	}
@@ -381,6 +382,11 @@ public class GKitAssemblyManager extends JFrame implements ActionListener
 				oos.reset();
 			}
 			else if (messageToServer.equals("Nest_TakePicture_Done"))
+			{
+				oos.writeObject(messageToServer);
+				oos.reset();
+			}
+			else if (messageToServer.equals("Kit_TakePicture_Done")) 
 			{
 				oos.writeObject(messageToServer);
 				oos.reset();

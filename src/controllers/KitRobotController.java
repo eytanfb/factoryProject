@@ -23,6 +23,11 @@ public class KitRobotController implements IKitRobotController
 
 	public KitRobotController(KitRobot kitRobot, GKitRobot gui)
 	{
+		this.kitRobot = kitRobot;
+	}
+
+	public void connect()
+	{
 		try
 		{
 			s = new Socket("localhost", 63432);
@@ -35,7 +40,6 @@ public class KitRobotController implements IKitRobotController
 		{
 			e.printStackTrace();
 		}
-		this.kitRobot = kitRobot;
 	}
 	
 	public void setServer(Server server)

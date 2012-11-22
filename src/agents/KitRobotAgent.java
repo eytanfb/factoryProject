@@ -198,6 +198,7 @@ public class KitRobotAgent extends Agent implements KitRobot
 	{
 		print("putEmptyKitToWorkingStand " + kit);
 		
+		print("Printing: " + conveyorSystem.getEnteringConveyor() + " Table: " + getFreeTable() + " Kit: " + kit);
 		controller.doAnim(conveyorSystem.getEnteringConveyor(), getFreeTable(), kit);
 		try
 		{
