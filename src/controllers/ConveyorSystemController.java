@@ -33,7 +33,6 @@ public class ConveyorSystemController implements IConveyorSystemController
 	{
 		try
 		{
-			System.out.println("ConveyorSystemController:I am trying to connect to the server");
 			s = new Socket("localhost", 63432);
 			oos = new ObjectOutputStream(s.getOutputStream());
 			System.out.println("ConveyorSystemController Client Ready");

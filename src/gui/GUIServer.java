@@ -34,7 +34,7 @@ import java.net.*;
 
 public class GUIServer implements Server
 {
-	boolean flag = false; // TODO this is a fucking hack
+	volatile boolean flag = false; // TODO this is a fucking hack
 	// //////// SAVE FILE VARIABLES //////////
 	FileOutputStream fOut;
 	FileInputStream fIn;
@@ -1222,13 +1222,17 @@ public class GUIServer implements Server
 						Conveyor currentConveyor_temp = (Conveyor) ois.readObject();
 						Kit activeKit_temp = (Kit) ois.readObject();
 						
-//						synchronized (Handlers)
-//						{
+						System.out.println("The size of Handlers:"+Handlers.size());
+						
+						synchronized (Handlers)
+						{
 							for (Handler h : Handlers)
 							{
 								h.oos.writeObject(command);
 								h.oos.reset();
-
+								
+								System.out.println("The information 'Conveyor_MoveKit' has been sent");
+								
 								if (currentConveyor_temp instanceof EnteringConveyor)
 								{
 									h.oos.writeObject("Entering");
@@ -1251,7 +1255,7 @@ public class GUIServer implements Server
 								}
 							}
 						}
-					//}
+					}
 					else if (command.equals("ConveyorIn_AnimationDone"))
 					{
 						//System.out.println("GUIServer: Before Calling conveyorin animation done");
