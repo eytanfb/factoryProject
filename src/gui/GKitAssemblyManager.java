@@ -67,7 +67,7 @@ public class GKitAssemblyManager extends JFrame implements ActionListener
 				while (true)
 				{
 					String command = ois.readObject().toString();
-
+					System.out.println("GKitAssemblyManager got the message:"+command);
 					// Part Robot Commands
 					if (command.equals("PartRobot_MoveToNest"))
 					{
@@ -125,8 +125,9 @@ public class GKitAssemblyManager extends JFrame implements ActionListener
 						// Perform moving kit into and away from the factory
 						conveyorPassedIn = new EnteringConveyor();//(Conveyor) ois.readObject();
 						kitPassedIn = new Kit();//(Kit) ois.readObject();
-						System.out.println("FUCKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK"+ kitPassedIn.getConfig() +"KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
+						
 						*/
+						System.out.println("FUCKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
 						String in_or_out=(String) ois.readObject();
 						Integer number=(Integer) ois.readObject();
 						Kit tempKit=new Kit();
@@ -299,11 +300,11 @@ public class GKitAssemblyManager extends JFrame implements ActionListener
 			s = new Socket("localhost", 63432);
 			System.out.println("s connected");
 			//r = new Socket("localhost", 63432);
-			System.out.println("r connected");
+			//System.out.println("r connected");
 			oos = new ObjectOutputStream(s.getOutputStream());
 			System.out.println("oos created");
 			ois = new ObjectInputStream(s.getInputStream());
-			System.out.println("Client Ready");
+			System.out.println("GKitAssembleManager Client Ready");
 			updateChecker = new UpdateChecker(s, ois);
 			new Thread(updateChecker).start();
 		} catch (UnknownHostException e)
@@ -400,7 +401,6 @@ public class GKitAssemblyManager extends JFrame implements ActionListener
 
 	public void actionPerformed(ActionEvent ae)
 	{
-		
 		try
 		{
 			oos.writeObject("Skip");

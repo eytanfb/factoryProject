@@ -507,13 +507,16 @@ public class GUIServer implements Server
 			{
 				while (true)
 				{
+					if(!flag)
+					{
+						kitRobotController.connect();
+						conveyorSystemController.connect();
+						flag = true;
+					}
+					
 					if(agentMessages.size()!=0)
 					{
-						if(!flag)
-						{
-							kitRobotController.connect();
-							flag = true;
-						}
+						
 						String currentMessage=agentMessages.remove(0);
 						
 						if (currentMessage.equals("Kits"))
@@ -709,47 +712,7 @@ public class GUIServer implements Server
 							}
 							
 						}
-						// CONVEYOR currentMessageS //
-						else if (currentMessage.equals("Conveyor_MoveKit"))
-						{
-							//System.out.println("GUIServer: Pushing Updates: " + currentMessage);
-							
-							synchronized (Handlers)
-							{
-								for (Handler h : Handlers)
-								{
-									h.oos.writeObject(currentMessage);
-									h.oos.reset();
-
-									if (currentConveyor instanceof EnteringConveyor)
-									{
-										h.oos.writeObject("Entering");
-										h.oos.reset();
-									} else if (currentConveyor instanceof ExitingConveyor)
-									{
-										h.oos.writeObject("Exiting");
-										h.oos.reset();
-									}
-
-									h.oos.writeObject(new Integer(
-											activeKit.parts.size()));
-									h.oos.reset();
-									for (int i = 0; i < activeKit.parts.size(); i++)
-									{
-										h.oos.writeObject(activeKit.parts
-												.get(i).partType);
-										h.oos.reset();
-									}
-								}
-							}
-							
-							
-							
-							/*
-							h.oos.writeObject(activeKit);
-							h.oos.reset();
-							*/
-						}
+						
 						// else if(currentMessage.equals("ConveyorIn_AnimationDone"))
 						// {
 						// System.out.println("GUIServer: Pushing Updates: "+currentMessage);
@@ -1254,6 +1217,41 @@ public class GUIServer implements Server
 					}
 
 					// CONVEYOR COMMANDS //
+					else if (command.equals("Conveyor_MoveKit"))
+					{
+						Conveyor currentConveyor_temp = (Conveyor) ois.readObject();
+						Kit activeKit_temp = (Kit) ois.readObject();
+						
+//						synchronized (Handlers)
+//						{
+							for (Handler h : Handlers)
+							{
+								h.oos.writeObject(command);
+								h.oos.reset();
+
+								if (currentConveyor_temp instanceof EnteringConveyor)
+								{
+									h.oos.writeObject("Entering");
+									System.out.println("##########The Type is EnteringConveyor "+currentConveyor_temp);
+									h.oos.reset();
+								} else if (currentConveyor_temp instanceof ExitingConveyor)
+								{
+									h.oos.writeObject("Exiting");
+									h.oos.reset();
+								}
+
+								h.oos.writeObject(new Integer(
+										activeKit_temp.parts.size()));
+								h.oos.reset();
+								for (int i = 0; i < activeKit_temp.parts.size(); i++)
+								{
+									h.oos.writeObject(activeKit_temp.parts
+											.get(i).partType);
+									h.oos.reset();
+								}
+							}
+						}
+					//}
 					else if (command.equals("ConveyorIn_AnimationDone"))
 					{
 						//System.out.println("GUIServer: Before Calling conveyorin animation done");
