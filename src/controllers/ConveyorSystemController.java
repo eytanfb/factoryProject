@@ -29,6 +29,7 @@ public class ConveyorSystemController implements IConveyorSystemController
 		this.conveyorSystem = conveyorSystem;
 	}
 	
+	/*
 	public void connect()
 	{
 		try
@@ -44,6 +45,7 @@ public class ConveyorSystemController implements IConveyorSystemController
 			e.printStackTrace();
 		}
 	}
+	*/
 	
 	public ConveyorSystemController(Server server)
 	{
@@ -57,9 +59,11 @@ public class ConveyorSystemController implements IConveyorSystemController
 	
 	public void doAnim(Conveyor conveyor, Kit kit)
 	{
-		//server.doMove(kit, conveyor);
+		server.doMove(kit, conveyor);
+		/*
 		try
 		{
+			System.out.println("The size of the kit in the controller"+kit.parts.size());
 			oos.writeObject("Conveyor_MoveKit");
 			oos.reset();
 			oos.writeObject(conveyor);
@@ -70,6 +74,7 @@ public class ConveyorSystemController implements IConveyorSystemController
 		{
 			e.printStackTrace();
 		}
+		*/
 	}
 
 	public void animDone()

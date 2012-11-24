@@ -121,13 +121,7 @@ public class GKitAssemblyManager extends JFrame implements ActionListener
 					// Conveyor Commands
 					else if (command.equals("Conveyor_MoveKit"))
 					{
-						/*
-						// Perform moving kit into and away from the factory
-						conveyorPassedIn = new EnteringConveyor();//(Conveyor) ois.readObject();
-						kitPassedIn = new Kit();//(Kit) ois.readObject();
-						
-						*/
-						System.out.println("FUCKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
+						System.out.println("GKitAssemblyManager received:Conveyor_MoveKit");
 						String in_or_out=(String) ois.readObject();
 						Integer number=(Integer) ois.readObject();
 						Kit tempKit=new Kit();
@@ -323,7 +317,7 @@ public class GKitAssemblyManager extends JFrame implements ActionListener
 		add(KAMPanel);
 		validate();
 
-		timer = new Timer(1000, this);
+		timer = new Timer(500, this);
 		timer.start();
 
 	}
