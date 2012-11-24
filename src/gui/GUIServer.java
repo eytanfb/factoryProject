@@ -507,13 +507,14 @@ public class GUIServer implements Server
 			{
 				while (true)
 				{
+					if(!flag)
+					{
+						kitRobotController.connect();
+						flag = true;
+					}
 					if(agentMessages.size()!=0)
 					{
-						if(!flag)
-						{
-							kitRobotController.connect();
-							flag = true;
-						}
+						
 						String currentMessage=agentMessages.remove(0);
 
 						if (currentMessage.equals("Kits"))

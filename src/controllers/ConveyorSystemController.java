@@ -29,7 +29,7 @@ public class ConveyorSystemController implements IConveyorSystemController
 		this.conveyorSystem = conveyorSystem;
 	}
 	
-	/*
+	
 	public void connect()
 	{
 		try
@@ -45,7 +45,7 @@ public class ConveyorSystemController implements IConveyorSystemController
 			e.printStackTrace();
 		}
 	}
-	*/
+	
 	
 	public ConveyorSystemController(Server server)
 	{
